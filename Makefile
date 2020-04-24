@@ -13,18 +13,17 @@ SAMPLE_BINARY_NAME=main
 GO_PKGS=$(shell go list ./... | grep -v /vendor/)
 GO_FILES=$(shell find . -type f -name '*.go' -not -path './vendor/*')
 
-    
+
 all: clean test build package
 
 setup: $(LINT_TOOL) setup_dev
 
 setup_dev:
 	go get -u golang.org/x/tools/cmd/goimports
-	go get -u github.com/golang/dep/cmd/dep
 	go get golang.org/x/tools/cmd/cover
 
 deps:
-	dep ensure
+	go mod download
 
 build: deps
 	$(GOBUILD) ./...
@@ -33,7 +32,7 @@ build: deps
 package:
 	cd sample && zip main.zip $(SAMPLE_BINARY_NAME)
 
-test: 
+test:
 	$(GOTEST) -v ./...
 
 fmt:
@@ -51,4 +50,4 @@ lint: qc
 clean:
 	rm -f sample/$(SAMPLE_BINARY_NAME)
 	rm -f sample/$(SAMPLE_BINARY_NAME).zip
-	rm -rf ./vendor Gopkg.lock
+	rm -rf ./vendor
